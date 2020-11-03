@@ -1,17 +1,20 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-## Initialize database
+# Initialize database
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
+## Define tables
+
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    secret = db.Column(db.String(80), nullable=False)
-    name = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(80), nullable=False, unique=True)
+    password = db.Column(db.String(80), nullable=False)
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
