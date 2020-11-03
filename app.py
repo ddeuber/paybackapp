@@ -63,10 +63,34 @@ class TransactionList(flask_restful.Resource):
             transactions.append(t.to_dict())
         return transactions
 
+class Debts(flask_restful.Resource):
+    def get(self, group_name):
+        output = {}
+        try:
+            group_id = Group.query.filter_by(name=group_name).first().id
+        except:
+            return 'could not find group \'' + group_name + '\'', 400
+        for t in Transaction.query.filter_by(group_id=group_id):
+            t_dict = t.to_dict()
+            # create entry for every member that's not yet in output
+            for member in [t_dict['payer']] + t_dict['involved']:
+                if member not in output:
+                    output[member] = {'spent': 0, 'owes': 0}
+            output[t_dict['payer']]['spent'] += t_dict['amount']
+            for member in t_dict['involved']:
+                output[member]['owes'] += t_dict['amount'] / len(t_dict['involved'])
+
+        for member in output:
+            output[member]['credit'] = output[member]['spent'] - output[member]['owes']
+            
+        return output
+
+
 
 api.add_resource(TransactionList, '/transactions/<string:group_name>')
 api.add_resource(AddGroup, '/add_group')
 api.add_resource(AddTransaction, '/add_transaction')
+api.add_resource(Debts, '/debts/<string:group_name>')
 
 if __name__ == '__main__':
     app.run(host='::', debug=True)
