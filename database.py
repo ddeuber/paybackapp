@@ -22,7 +22,8 @@ class Transaction(db.Model):
     payer = db.Column(db.String(80), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     comment = db.Column(db.String(80), nullable=False)
-    timestamp = db.Column(db.Integer, nullable=False, index=True)
+    creation_timestamp = db.Column(db.Integer, nullable=False, index=True)
+    server_timestamp = db.Column(db.DateTime, nullable=False)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
     group = db.relationship('Group', backref='transactions')
 
