@@ -32,7 +32,7 @@ class Transaction(db.Model):
     amount = db.Column(db.Float, nullable=False)
     comment = db.Column(db.String(80), nullable=False)
     creation_timestamp = db.Column(db.Integer, nullable=False)
-    server_timestamp = db.Column(db.DateTime, nullable=False, index=True)
+    server_timestamp = db.Column(db.Integer, nullable=False, index=True)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
     group = db.relationship('Group', backref='transactions')
 
@@ -42,8 +42,8 @@ class Transaction(db.Model):
         self.amount=transaction_dict['amount']
         self.comment=transaction_dict['comment']
         self.creation_timestamp=transaction_dict['timestamp']
-        self.server_timestamp=datetime.now()
-        self.group_id = Group.query.filter_by(name=transaction_dict['group_name']).first().id
+        self.server_timestamp=int(datetime.now().timestamp()*1000)
+        self.group = Group.query.filter_by(name=transaction_dict['group_name']).first()
 
     def to_dict(self):
         participants = []
