@@ -58,15 +58,15 @@ class TransactionUpdate(flask_restful.Resource):
         try:
             ## Get transactions added after timestamp
             try:
-                group = Group.query.filter_by(name=group_name).first()
-                return_transaction_list =  group.transactions.filter_by(server_timestamp > timestamp)
+                return_transaction_list = [t.to_dict() for t in Transaction.query.join(Group).filter_by(name=group_name).filter(Transaction.server_timestamp>timestamp)]
             except:
-                raise Exception('could not find group \'' + group_name + '\''})
+                raise Exception('could not find group \'' + group_name + '\'')
             ## Add new transactions
             for transaction in request_transaction_list:
                 add_transaction(transaction)
             db.session.commit()
             return {"server_timestamp": int(datetime.now().timestamp()*1000), "transactions": return_transaction_list}
+
         except Exception as e:
             return {'error': str(e)}, 400
 

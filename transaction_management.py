@@ -12,7 +12,7 @@ def add_transaction(transaction):
     at_least_one_participant = False
     for participant in transaction['involved']:
         at_least_one_participant = True
-        involved = Involved(transaction_id=transaction_for_database.id, participant=participant)
+        involved = Involved(transaction=transaction_for_database, participant=participant)
         db.session.add(involved)
     if not at_least_one_participant:
         db.session.delete(transaction_for_database)
