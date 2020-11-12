@@ -1,0 +1,77 @@
+{
+	"info": {
+		"_postman_id": "55784087-6aa7-40d6-963a-ff023ea18f3c",
+		"name": "paybackapp client test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "http://localhost:5000/add_transaction",
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/jose",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"creator\":\"38a1cb7c-2dc6-40d5-9d7a-f94f82289363\",\"payer\":\"osmaan\",\"involved\":[\"osmaan\",\"fetteli\"],\"amount\":312,\"comment\":\"nüt\",\"timestamp\":1604346680629,\n\"group_name\": \"213\"}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/add_transaction",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"add_transaction"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:5000/add_group",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"name\": \"213\", \"password\": \"taco\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5000/add_group",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"add_group"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
