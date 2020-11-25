@@ -8,8 +8,10 @@ from database import app, db, Transaction, Involved, Group
 from datetime import datetime
 from transaction_management import add_transaction
 import json
+import sys
 
-api = flask_restful.Api(app) 
+
+api = flask_restful.Api(app)
 
 class AddGroup(flask_restful.Resource):
     def post(self):
@@ -101,6 +103,14 @@ api.add_resource(TransactionUpdate, '/update/<string:group_name>/<int:timestamp>
 api.add_resource(AddGroup, '/add_group')
 api.add_resource(AddTransaction, '/add_transaction')
 api.add_resource(Debts, '/debts/<string:group_name>')
+#TODO: create endpoint to list participants of a group
 
 if __name__ == '__main__':
-    app.run(host='::', debug=True)
+    if len(sys.argv) == 3:
+        tls_context = (sys.argv[1], sys.argv[2])
+        app.run(host='::', debug=True, ssl_context=tls_context) 
+    else:
+        print('NOT USING HTTPS')
+        print('use this command to enable HTTPS:')
+        print('\t python3 app.py /path/to/cert /path/to/privkey')
+        app.run(host='::', debug=True)
