@@ -47,7 +47,7 @@ class Transaction(db.Model):
 
     def to_dict(self):
         participants = []
-        for involved_entry in self.involved: 
+        for involved_entry in self.involved:
             participants.append(involved_entry.participant)
         if len(participants) == 0:
             raise Exception('no one is involved in transaction with id ' + str(self.id))
