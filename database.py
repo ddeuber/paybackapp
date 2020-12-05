@@ -12,18 +12,20 @@ db = SQLAlchemy(app)
 
 ## Define tables
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(240), nullable=False)
+
+
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
+    name = db.Column(db.String(80), nullable=False)
 
     def __init__(self, group_dict):
         if not isinstance(group_dict['name'], str):
             raise Exception('name is not a string')
-        if not isinstance(group_dict['password'], str):
-            raise Exception('password is not a string')
         self.name = group_dict['name']
-        self.password = group_dict['password']
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
