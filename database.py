@@ -15,6 +15,7 @@ db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), nullable=False)
+    # TODO: check if email is a correct email address
     password = db.Column(db.String(240), nullable=False)
 
 
@@ -28,6 +29,16 @@ class Group(db.Model):
         self.name = group_dict['name']
 
 
+class Groupaccess(db.Model):
+    # This table determines which user has access to which groups.
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    user = db.relationship('User', backref='groupaccess')
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
+    group = db.relationship('Group', backref='groupaccess')
+    deleted = db.Column(db.Boolean, nullable=False, default=False) # If True, the user no longer has access to the group
+
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.String(36), nullable=False)
@@ -39,14 +50,14 @@ class Transaction(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
     group = db.relationship('Group', backref='transactions')
 
-    def __init__(self, transaction_dict):
+    def __init__(self, transaction_dict, group):
         self.creator=transaction_dict['creator']
         self.payer=transaction_dict['payer']
         self.amount=transaction_dict['amount']
         self.comment=transaction_dict['comment']
         self.creation_timestamp=transaction_dict['timestamp']
         self.server_timestamp=int(datetime.now().timestamp()*1000)
-        self.group = Group.query.filter_by(name=transaction_dict['group_name']).first()
+        self.group = group 
 
     def to_dict(self):
         participants = []
@@ -61,9 +72,9 @@ class Transaction(db.Model):
             'amount': self.amount,
             'comment': self.comment,
             'timestamp': self.creation_timestamp,
-            'group_name': self.group.name,
             'involved': participants
         }
+
 
 class Involved(db.Model):
     id = db.Column(db.Integer, primary_key=True)
