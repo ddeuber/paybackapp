@@ -1,32 +1,8 @@
-#TODO:
-# add authentication (maybe this can also include the group password)
-
 import flask
 import flask_restful
-from flask_sqlalchemy import SQLAlchemy
-from database import app, db, Transaction, Involved, Group
-from datetime import datetime
 from transaction_management import add_transaction
-import json
-import sys
+from database import db, Transaction, Involved, Group, User
 
-
-api = flask_restful.Api(app)
-
-class AddGroup(flask_restful.Resource):
-    def post(self):
-        group_from_request = flask.request.get_json(force=True)
-        try:
-            group_for_database = Group(group_from_request)
-            db.session.add(group_for_database)
-            db.session.commit()
-            return {'id': group_for_database.id}, 201
-        except Exception as e:
-            if str(e).find('is not a string') != -1:
-                return {'error': str(e)}, 400
-            if str(e).find('UNIQUE constraint failed: group.name') != -1:
-                return {'error': 'group name \'' + group_from_request['name'] + '\' already exists'}, 400
-            return {'error': 'could not create group from your json'}, 400
 
 
 
@@ -95,22 +71,3 @@ class Debts(flask_restful.Resource):
             output[member]['credit'] = output[member]['spent'] - output[member]['owes']
             
         return output
-
-
-
-api.add_resource(TransactionList, '/transactions/<string:group_name>')
-api.add_resource(TransactionUpdate, '/update/<string:group_name>/<int:timestamp>')
-api.add_resource(AddGroup, '/add_group')
-api.add_resource(AddTransaction, '/add_transaction')
-api.add_resource(Debts, '/debts/<string:group_name>')
-#TODO: create endpoint to list participants of a group
-
-if __name__ == '__main__':
-    if len(sys.argv) == 3:
-        tls_context = (sys.argv[1], sys.argv[2])
-        app.run(host='::', debug=True, ssl_context=tls_context) 
-    else:
-        print('NOT USING HTTPS')
-        print('use this command to enable HTTPS:')
-        print('\t python3 app.py /path/to/cert /path/to/privkey')
-        app.run(host='::', debug=True)

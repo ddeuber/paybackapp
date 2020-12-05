@@ -27,6 +27,7 @@ class Group(db.Model):
             raise Exception('name is not a string')
         self.name = group_dict['name']
 
+
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     creator = db.Column(db.String(36), nullable=False)
