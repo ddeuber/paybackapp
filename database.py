@@ -55,15 +55,17 @@ class Transaction(db.Model):
     group = db.relationship('Group', backref='transactions')
 
     def __init__(self, transaction_dict, group):
-            self.creator=transaction_dict.get('creator')
-            self.payer=transaction_dict.get('payer')
-            self.amount=transaction_dict.get('amount')
-            self.comment=transaction_dict.get('comment')
-            if not isinstance(transaction_dict.get('timestamp'), int):
-                raise TimestampTypeError
-            self.creation_timestamp=transaction_dict.get('timestamp')
-            self.server_timestamp=int(datetime.now().timestamp()*1000)
-            self.group = group 
+        if not isinstance(transaction_dict, dict):
+            raise SchemaValidationError
+        self.creator=transaction_dict.get('creator')
+        self.payer=transaction_dict.get('payer')
+        self.amount=transaction_dict.get('amount')
+        self.comment=transaction_dict.get('comment')
+        if not isinstance(transaction_dict.get('timestamp'), int):
+            raise TimestampTypeError
+        self.creation_timestamp=transaction_dict.get('timestamp')
+        self.server_timestamp=int(datetime.now().timestamp()*1000)
+        self.group = group 
 
     def to_dict(self):
         participants = []

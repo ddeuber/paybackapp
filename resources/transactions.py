@@ -30,8 +30,6 @@ def add_transaction(transaction, group):
 class AddTransaction(flask_restful.Resource):
     def post(self, group_id):
         transaction_from_request = flask.request.get_json(force=True)
-        if not isinstance(transaction_from_request, dict):
-            raise SchemaValidationError
         group = Group.query.get(group_id)
         if group is None:
             raise GroupNotFoundError
