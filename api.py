@@ -4,18 +4,18 @@
 import flask_restful
 from database import app, db
 import sys
-from endpoints.transactions import TransactionList, TransactionUpdate, AddTransaction, Debts 
-from endpoints.groups import AddGroup
+from resources.transactions import TransactionList, TransactionUpdate, AddTransaction, Debts 
+from resources.groups import AddGroup
+from resources.errors import errors
 
 
-api = flask_restful.Api(app)
+api = flask_restful.Api(app, errors=errors)
 
 #### Login endpoints
 
 #### Transaction endpoints
 api.add_resource(TransactionList, '/transactions/<int:group_id>')
-## TODO: move timestamp to query
-api.add_resource(TransactionUpdate, '/update/<int:group_id>/<int:timestamp>')
+api.add_resource(TransactionUpdate, '/update/<int:group_id>')
 api.add_resource(AddTransaction, '/add_transaction/<int:group_id>')
 api.add_resource(Debts, '/debts/<int:group_id>')
 
@@ -30,5 +30,5 @@ if __name__ == '__main__':
     else:
         print('NOT USING HTTPS')
         print('use this command to enable HTTPS:')
-        print('\t python3 app.py /path/to/cert /path/to/privkey')
+        print('\t python3 api.py /path/to/cert /path/to/privkey')
         app.run(host='::', debug=True)

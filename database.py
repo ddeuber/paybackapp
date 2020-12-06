@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from resources.errors import TimestampTypeError, InvalidEmailAddressError, SchemaValidationError, NoInvolvedError
+import re
 
 # Initialize database
 
@@ -15,18 +17,20 @@ db = SQLAlchemy(app)
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(80), nullable=False)
-    # TODO: check if email is a correct email address
     password = db.Column(db.String(240), nullable=False)
+
+    def __init__(self, user_dict):
+        # Check if email string is valid
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", user_dict.get('email')):
+            raise InvalidEmailAddressError
+        self.email = user_dict.get('email')
+        # TODO: hash password
+        self.password = user_dict.get('password')
 
 
 class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
-
-    def __init__(self, group_dict):
-        if not isinstance(group_dict['name'], str):
-            raise Exception('name is not a string')
-        self.name = group_dict['name']
 
 
 class Groupaccess(db.Model):
@@ -51,20 +55,22 @@ class Transaction(db.Model):
     group = db.relationship('Group', backref='transactions')
 
     def __init__(self, transaction_dict, group):
-        self.creator=transaction_dict['creator']
-        self.payer=transaction_dict['payer']
-        self.amount=transaction_dict['amount']
-        self.comment=transaction_dict['comment']
-        self.creation_timestamp=transaction_dict['timestamp']
-        self.server_timestamp=int(datetime.now().timestamp()*1000)
-        self.group = group 
+            self.creator=transaction_dict.get('creator')
+            self.payer=transaction_dict.get('payer')
+            self.amount=transaction_dict.get('amount')
+            self.comment=transaction_dict.get('comment')
+            if not isinstance(transaction_dict.get('timestamp'), int):
+                raise TimestampTypeError
+            self.creation_timestamp=transaction_dict.get('timestamp')
+            self.server_timestamp=int(datetime.now().timestamp()*1000)
+            self.group = group 
 
     def to_dict(self):
         participants = []
         for involved_entry in self.involved:
             participants.append(involved_entry.participant)
         if len(participants) == 0:
-            raise Exception('no one is involved in transaction with id ' + str(self.id))
+            raise NoInvolvedError 
         return {
             #'id': self.id,
             'creator': self.creator,
