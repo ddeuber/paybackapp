@@ -1,18 +1,26 @@
+import re
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt 
+from flask_jwt_extended import JWTManager
 from datetime import datetime
-from resources.errors import TimestampTypeError, InvalidEmailAddressError, SchemaValidationError, NoInvolvedError
-import re
+from dotenv import load_dotenv, find_dotenv
+from resources.errors import TimestampTypeError, InvalidEmailAddressError, SchemaValidationError, NoInvolvedError, EmailAlreadyExistsError
+
+
+# Load .env file for JWT_SECRET_KEY
+load_dotenv(find_dotenv())
 
 # Initialize database
-
 app = Flask(__name__)
+app.config.from_envvar('ENV_FILE_LOCATION')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///payapp_database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
-
-## Define tables
+# Define tables
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,11 +29,21 @@ class User(db.Model):
 
     def __init__(self, user_dict):
         # Check if email string is valid
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", user_dict.get('email')):
+        if not isinstance(user_dict, dict):
+            raise SchemaValidationError
+        email = user_dict.get('email')
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             raise InvalidEmailAddressError
-        self.email = user_dict.get('email')
-        # TODO: hash password
-        self.password = user_dict.get('password')
+        # Check if email already exists in database
+        u = User.query.filter_by(email=email).first()
+        if u is None:
+            self.email = email
+        else:
+            raise EmailAlreadyExistsError
+        self.password = bcrypt.generate_password_hash(user_dict.get('password'))
+
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self.password, password)
 
 
 class Group(db.Model):
