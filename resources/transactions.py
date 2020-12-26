@@ -48,11 +48,22 @@ class AddTransaction(flask_restful.Resource):
 class TransactionList(flask_restful.Resource):
     @jwt_required
     def get(self, group_id):
+        body = flask.request.get_json(force=True) # body contains optional filter parameters payer, participant, limit and offset
+        if not isinstance(body, dict):
+           raise SchemaValidationError
         transactions = []
         group = get_group(group_id)
         user = get_user(get_jwt_identity())
         assert_access_to_group(user.id, group.id)
-        for t in group.transactions:
+        transaction_query = Transaction.query.filter_by(group_id=group.id)
+        payer = body.get('payer')
+        if payer is not None:
+            transaction_query = transaction_query.filter_by(payer=payer)
+        participant = body.get('participant')
+        if participant is not None:
+            transaction_query = transaction_query.join(Involved).filter_by(participant=participant)
+        group_transactions = transaction_query.limit(body.get('limit')).offset(body.get('offset'))
+        for t in group_transactions:
             transactions.append(t.to_dict())
         return transactions
 

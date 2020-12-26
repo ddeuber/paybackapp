@@ -17,11 +17,10 @@ api.add_resource(SignUp, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Refresh, '/refresh')
 
-
 #### Transaction endpoints
 api.add_resource(TransactionList, '/transactions/<int:group_id>')
 api.add_resource(TransactionUpdate, '/update/<int:group_id>')
-api.add_resource(AddTransaction, '/add_transaction/<int:group_id>')
+api.add_resource(AddTransaction, '/addtransaction/<int:group_id>')
 api.add_resource(Debts, '/debts/<int:group_id>')
 
 #### Group endpoints   
