@@ -93,7 +93,7 @@ errors = {
         'status': 400
     },
     'UnauthorizedError': {
-        'message': 'You are not authorized',
+        'message': 'Not authorized',
         'status': 401
     },
     'InvalidLoginError': {

@@ -2,8 +2,10 @@ import flask
 import flask_restful
 from database import db, Transaction, Involved, Group, User
 from datetime import datetime
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from resources.errors import TransactionSchemaError, NoInvolvedError, InvolvedNotIterableError, TimestampTypeError, SchemaValidationError
-from resources.groups import get_group
+from resources.groups import get_group, assert_access_to_group
+from resources.login import get_user
 from sqlalchemy.exc import IntegrityError, InterfaceError
 
 ### Utility functions
@@ -27,11 +29,14 @@ def add_transaction(transaction, group):
 
 ### Resources 
 
-# add a single transaction
+# Add a single transaction
 class AddTransaction(flask_restful.Resource):
+    @jwt_required
     def post(self, group_id):
         transaction_from_request = flask.request.get_json(force=True)
         group = get_group(group_id)
+        user = get_user(get_jwt_identity())
+        assert_access_to_group(user.id, group.id)
         try:
             add_transaction(transaction_from_request, group)
             db.session.commit()
@@ -41,15 +46,19 @@ class AddTransaction(flask_restful.Resource):
 
 # Get list of all transactions in group
 class TransactionList(flask_restful.Resource):
+    @jwt_required
     def get(self, group_id):
         transactions = []
         group = get_group(group_id)
+        user = get_user(get_jwt_identity())
+        assert_access_to_group(user.id, group.id)
         for t in group.transactions:
             transactions.append(t.to_dict())
         return transactions
 
 # Upload new transactions and download transaction uploaded after timestamp
 class TransactionUpdate(flask_restful.Resource):
+    @jwt_required
     def post(self, group_id):
         request_transaction_dict = flask.request.get_json(force=True)
         if not isinstance(request_transaction_dict, dict):
@@ -59,6 +68,8 @@ class TransactionUpdate(flask_restful.Resource):
             raise TimestampTypeError
         # Get transactions added after timestamp
         group = get_group(group_id)
+        user = get_user(get_jwt_identity())
+        assert_access_to_group(user.id, group.id)
         return_transaction_list = [t.to_dict() for t in Transaction.query.join(Group).filter(Group.id==group.id).filter(Transaction.server_timestamp>timestamp)]
         # Add new transactions
         try:
@@ -72,9 +83,12 @@ class TransactionUpdate(flask_restful.Resource):
 
 # Calculate depts for each participant
 class Debts(flask_restful.Resource):
+    @jwt_required
     def get(self, group_id):
         output = {}
         group = get_group(group_id)
+        user = get_user(get_jwt_identity())
+        assert_access_to_group(user.id, group.id)
         for t in group.transactions:
             t_dict = t.to_dict()
             # create entry for every member that's not yet in output
