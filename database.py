@@ -1,4 +1,5 @@
 import re
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt 
@@ -8,12 +9,13 @@ from dotenv import load_dotenv, find_dotenv
 from resources.errors import TimestampTypeError, InvalidEmailAddressError, SchemaValidationError, NoInvolvedError, EmailAlreadyExistsError
 
 
-# Load .env file for JWT_SECRET_KEY
-load_dotenv(find_dotenv())
+# Load .env file for environment variables 
+load_dotenv('.env')
+# TODO: set up .env file if not exists
 
 # Initialize database
 app = Flask(__name__)
-app.config.from_envvar('ENV_FILE_LOCATION')
+app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///payapp_database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -50,20 +52,22 @@ class Group(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
 
+    def to_dict(self):
+        return {"id": self.id, "name": self.name}
 
-class Groupaccess(db.Model):
+
+class GroupAccess(db.Model):
     # This table determines which user has access to which groups.
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
-    user = db.relationship('User', backref='groupaccess')
+    user = db.relationship('User', backref='group_access_entries')
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
-    group = db.relationship('Group', backref='groupaccess')
-    deleted = db.Column(db.Boolean, nullable=False, default=False) # If True, the user no longer has access to the group
+    group = db.relationship('Group', backref='group_access_entries')
 
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    creator = db.Column(db.String(36), nullable=False)
+    creator = db.Column(db.String(36), nullable=False) # TODO: determine if this might be replaced with reference to user table
     payer = db.Column(db.String(80), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     comment = db.Column(db.String(80), nullable=False)

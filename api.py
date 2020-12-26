@@ -5,7 +5,7 @@ import flask_restful
 from database import app, db
 import sys
 from resources.transactions import TransactionList, TransactionUpdate, AddTransaction, Debts 
-from resources.groups import AddGroup
+from resources.groups import AddGroup, GetGroupsForUser, AddUserToGroup, LeaveGroup
 from resources.errors import errors
 from resources.login import SignUp, Login, Refresh
 
@@ -25,7 +25,11 @@ api.add_resource(AddTransaction, '/add_transaction/<int:group_id>')
 api.add_resource(Debts, '/debts/<int:group_id>')
 
 #### Group endpoints   
-api.add_resource(AddGroup, '/add_group')
+api.add_resource(AddGroup, '/addgroup')
+api.add_resource(GetGroupsForUser, '/groups')
+api.add_resource(AddUserToGroup, '/addusertogroup/<int:group_id>')
+api.add_resource(LeaveGroup, '/leavegroup/<int:group_id>')
+
 #TODO: create endpoint to list participants of a group
 
 if __name__ == '__main__':

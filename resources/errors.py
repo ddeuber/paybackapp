@@ -10,6 +10,12 @@ class InvolvedNotIterableError(HTTPException):
 class GroupNotFoundError(HTTPException):
     pass
 
+class UserNotFoundError(HTTPException):
+    pass
+
+class UserAlreadyInGroup(HTTPException):
+    pass
+
 class InvalidGroupNameError(HTTPException):
     pass 
 
@@ -34,6 +40,9 @@ class InvalidEmailAddressError(HTTPException):
 class UnauthorizedError(HTTPException):
     pass
 
+class InvalidLoginError(HTTPException):
+    pass
+
 errors = {
     'NoInvolvedError': {
         'message': 'There must be at least one participant involved',
@@ -45,6 +54,14 @@ errors = {
     },
     'GroupNotFoundError': {
         'message': 'Group not found',
+        'status': 400
+    },
+    'UserNotFoundError': {
+        'message': 'User not found',
+        'status': 400
+    },
+    'UserAlreadyInGroup': {
+        'message': 'User has already access to group',
         'status': 400
     },
     'InvalidGroupNameError': {
@@ -76,6 +93,10 @@ errors = {
         'status': 400
     },
     'UnauthorizedError': {
+        'message': 'You are not authorized',
+        'status': 401
+    },
+    'InvalidLoginError': {
         'message': 'Invalid username or password',
         'status': 401
     }

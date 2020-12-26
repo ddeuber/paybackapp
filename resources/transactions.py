@@ -2,7 +2,8 @@ import flask
 import flask_restful
 from database import db, Transaction, Involved, Group, User
 from datetime import datetime
-from resources.errors import TransactionSchemaError, GroupNotFoundError, NoInvolvedError, InvolvedNotIterableError, TimestampTypeError, SchemaValidationError
+from resources.errors import TransactionSchemaError, NoInvolvedError, InvolvedNotIterableError, TimestampTypeError, SchemaValidationError
+from resources.groups import get_group
 from sqlalchemy.exc import IntegrityError, InterfaceError
 
 ### Utility functions
@@ -30,9 +31,7 @@ def add_transaction(transaction, group):
 class AddTransaction(flask_restful.Resource):
     def post(self, group_id):
         transaction_from_request = flask.request.get_json(force=True)
-        group = Group.query.get(group_id)
-        if group is None:
-            raise GroupNotFoundError
+        group = get_group(group_id)
         try:
             add_transaction(transaction_from_request, group)
             db.session.commit()
@@ -44,9 +43,7 @@ class AddTransaction(flask_restful.Resource):
 class TransactionList(flask_restful.Resource):
     def get(self, group_id):
         transactions = []
-        group = Group.query.get(group_id)
-        if group is None:
-            raise GroupNotFoundError
+        group = get_group(group_id)
         for t in group.transactions:
             transactions.append(t.to_dict())
         return transactions
@@ -61,9 +58,7 @@ class TransactionUpdate(flask_restful.Resource):
         if not isinstance(timestamp, int):
             raise TimestampTypeError
         # Get transactions added after timestamp
-        group = Group.query.get(group_id)
-        if group is None:
-            raise GroupNotFoundError 
+        group = get_group(group_id)
         return_transaction_list = [t.to_dict() for t in Transaction.query.join(Group).filter(Group.id==group.id).filter(Transaction.server_timestamp>timestamp)]
         # Add new transactions
         try:
@@ -79,9 +74,7 @@ class TransactionUpdate(flask_restful.Resource):
 class Debts(flask_restful.Resource):
     def get(self, group_id):
         output = {}
-        group = Group.query.get(group_id)
-        if group is None:
-            raise GroupNotFoundError
+        group = get_group(group_id)
         for t in group.transactions:
             t_dict = t.to_dict()
             # create entry for every member that's not yet in output
