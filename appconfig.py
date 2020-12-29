@@ -21,9 +21,9 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_USE_TLS'] = bool(int(os.getenv('MAIL_USE_TLS'))) # booleans are encoded as 1 and 0
 app.config['MAIL_USE_SSL'] = bool(int(os.getenv('MAIL_USE_SSL')))
 app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
 
 # Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///payapp_database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize database, security and mail
