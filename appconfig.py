@@ -11,7 +11,9 @@ from dotenv import load_dotenv, find_dotenv
 app = Flask(__name__)
 
 # Load .env file for environment variables 
-load_dotenv('.env')
+# load_dotenv('.env')
+# Alternative .env file for testing
+load_dotenv('.env.test')
 
 # Import configuration from environment
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
