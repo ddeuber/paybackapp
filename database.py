@@ -1,28 +1,16 @@
 import re
-import os
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt 
-from flask_jwt_extended import JWTManager
-from datetime import datetime
-from dotenv import load_dotenv, find_dotenv
+from flask_sqlalchemy import SQLAlchemy 
+from appconfig import db, bcrypt
 from resources.errors import TimestampTypeError, InvalidEmailAddressError, SchemaValidationError, NoInvolvedError, EmailAlreadyExistsError
 
 
-# Load .env file for environment variables 
-load_dotenv('.env')
-# TODO: set up .env file if not exists
+# Function for hashing passwords
 
-# Initialize database
-app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///payapp_database.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
-jwt = JWTManager(app)
+def hash_password(password):
+    return bcrypt.generate_password_hash(password)
 
-# Define tables
+
+###  Define tables
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -42,7 +30,11 @@ class User(db.Model):
             self.email = email
         else:
             raise EmailAlreadyExistsError
-        self.password = bcrypt.generate_password_hash(user_dict.get('password'))
+        # Check if password is nonempty and hash it
+        password = user_dict.get('password')
+        if password is None:
+            raise SchemaValidationError
+        self.password = hash_password(password)
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)

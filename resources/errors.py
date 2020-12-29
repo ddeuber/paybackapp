@@ -10,6 +10,9 @@ class InvolvedNotIterableError(HTTPException):
 class GroupNotFoundError(HTTPException):
     pass
 
+class NoAccessToGroupError(HTTPException):
+    pass
+
 class UserNotFoundError(HTTPException):
     pass
 
@@ -34,6 +37,9 @@ class SchemaValidationError(HTTPException):
 class EmailAlreadyExistsError(HTTPException):
     pass
 
+class EmailDoesNotExistError(HTTPException):
+    pass
+
 class InvalidEmailAddressError(HTTPException):
     pass
 
@@ -41,6 +47,9 @@ class UnauthorizedError(HTTPException):
     pass
 
 class InvalidLoginError(HTTPException):
+    pass
+
+class BadTokenError(HTTPException):
     pass
 
 errors = {
@@ -55,6 +64,10 @@ errors = {
     'GroupNotFoundError': {
         'message': 'Group not found',
         'status': 400
+    },
+    'NoAccessToGroupError': {
+        'message': 'User is not authorized to access group',
+        'status': 403
     },
     'UserNotFoundError': {
         'message': 'User not found',
@@ -88,6 +101,10 @@ errors = {
         'message': 'User with given email address already exists',
         'status': 400
     },
+    'EmailDoesNotExistError': {
+        'message': 'User with given email address does not exist',
+        'status': 400
+    },
     'InvalidEmailAddressError': {
         'message': 'Email address is not valid',
         'status': 400
@@ -99,5 +116,9 @@ errors = {
     'InvalidLoginError': {
         'message': 'Invalid username or password',
         'status': 401
+    },
+    'BadTokenError': {
+        'message': 'Invalid token',
+        'status': 403
     }
 }

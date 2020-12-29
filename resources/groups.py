@@ -1,8 +1,8 @@
 import flask
-import flask_restful
+from flask_restful import Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from database import db, Transaction, Involved, Group, User, GroupAccess
-from resources.errors import InvalidGroupNameError, SchemaValidationError, UnauthorizedError, GroupNotFoundError, UserNotFoundError, UserAlreadyInGroup
+from resources.errors import InvalidGroupNameError, SchemaValidationError, NoAccessToGroupError, GroupNotFoundError, UserNotFoundError, UserAlreadyInGroup
 from resources.login import get_user
 from sqlalchemy.exc import IntegrityError, InterfaceError
 
@@ -18,13 +18,13 @@ def get_group(group_id):
 def assert_access_to_group(user_id, group_id):
     group_access = GroupAccess.query.filter_by(user_id=user_id, group_id=group_id).first()
     if group_access is None:
-        raise UnauthorizedError
+        raise NoAccessToGroupError 
     return group_access
 
 
 ### Endpoints
 
-class AddGroup(flask_restful.Resource):
+class AddGroup(Resource):
     @jwt_required
     def post(self):
         user = get_user(get_jwt_identity())
@@ -43,7 +43,7 @@ class AddGroup(flask_restful.Resource):
 
 
 # Returns the list of groups where the user is a member
-class GetGroupsForUser(flask_restful.Resource):
+class GetGroupsForUser(Resource):
      @jwt_required
      def get(self):
         user = get_user(get_jwt_identity())
@@ -54,7 +54,7 @@ class GetGroupsForUser(flask_restful.Resource):
 
 
 # Add another member to group by his email
-class AddUserToGroup(flask_restful.Resource):
+class AddUserToGroup(Resource):
     @jwt_required
     def post(self, group_id):
         # First check if user and group exist
@@ -80,7 +80,7 @@ class AddUserToGroup(flask_restful.Resource):
         return {'message': 'Successfully added new member to group'}, 200
 
 
-class LeaveGroup(flask_restful.Resource):
+class LeaveGroup(Resource):
     @jwt_required
     def post(self, group_id):
         # First check if user and group exist

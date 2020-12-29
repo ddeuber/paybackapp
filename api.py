@@ -1,21 +1,23 @@
-#TODO:
-# add authentication (maybe this can also include the group password)
-
-import flask_restful
-from database import app, db
+from flask_restful import Api
+from appconfig import app
 import sys
 from resources.transactions import TransactionList, TransactionUpdate, AddTransaction, Debts 
 from resources.groups import AddGroup, GetGroupsForUser, AddUserToGroup, LeaveGroup
 from resources.errors import errors
 from resources.login import SignUp, Login, Refresh
+from resources.passwordreset import ResetPassword, ForgotPassword
 
 
-api = flask_restful.Api(app, errors=errors)
+api = Api(app, errors=errors)
 
 #### Login endpoints
 api.add_resource(SignUp, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(Refresh, '/refresh')
+
+#### Password Reset Endpoints
+api.add_resource(ResetPassword, '/resetpassword')
+api.add_resource(ForgotPassword, '/forgotpassword')
 
 #### Transaction endpoints
 api.add_resource(TransactionList, '/transactions/<int:group_id>')

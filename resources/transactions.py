@@ -1,5 +1,5 @@
 import flask
-import flask_restful
+from flask_restful import Resource
 from database import db, Transaction, Involved, Group, User
 from datetime import datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -30,7 +30,7 @@ def add_transaction(transaction, group):
 ### Resources 
 
 # Add a single transaction
-class AddTransaction(flask_restful.Resource):
+class AddTransaction(Resource):
     @jwt_required
     def post(self, group_id):
         transaction_from_request = flask.request.get_json(force=True)
@@ -45,7 +45,7 @@ class AddTransaction(flask_restful.Resource):
         return {'added transaction': transaction_from_request}, 201
 
 # Get list of all transactions in group
-class TransactionList(flask_restful.Resource):
+class TransactionList(Resource):
     @jwt_required
     def get(self, group_id):
         body = flask.request.get_json(force=True) # body contains optional filter parameters payer, participant, limit and offset
@@ -68,7 +68,7 @@ class TransactionList(flask_restful.Resource):
         return transactions
 
 # Upload new transactions and download transaction uploaded after timestamp
-class TransactionUpdate(flask_restful.Resource):
+class TransactionUpdate(Resource):
     @jwt_required
     def post(self, group_id):
         request_transaction_dict = flask.request.get_json(force=True)
@@ -93,7 +93,7 @@ class TransactionUpdate(flask_restful.Resource):
 
 
 # Calculate depts for each participant
-class Debts(flask_restful.Resource):
+class Debts(Resource):
     @jwt_required
     def get(self, group_id):
         output = {}

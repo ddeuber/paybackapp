@@ -1,5 +1,5 @@
 import flask
-import flask_restful
+from flask_restful import Resource
 from database import db, User
 from resources.errors import SchemaValidationError, UnauthorizedError, InvalidLoginError
 from flask_jwt_extended import (
@@ -18,7 +18,7 @@ def get_user(user_id):
 
 ### Endpoints 
 
-class SignUp(flask_restful.Resource):
+class SignUp(Resource):
     def post(self):
         user_dict = flask.request.get_json(force=True)
         user = User(user_dict)
@@ -27,7 +27,7 @@ class SignUp(flask_restful.Resource):
         return {'message': 'Successfully added user with email address ' + user.email}, 201
 
 
-class Login(flask_restful.Resource):
+class Login(Resource):
     def post(self):
         user_dict = flask.request.get_json(force=True)
         if not isinstance(user_dict, dict):
@@ -36,14 +36,14 @@ class Login(flask_restful.Resource):
         if user is None:
             raise InvalidLoginError
         if user.check_password(user_dict.get('password')):
-            return({'access_token': create_access_token(identity=user.id),
+            return({'access_token': create_access_token(identity=user.id, fresh=True),
                     'refresh_token': create_refresh_token(identity=user.id)}), 200
         else:
             raise InvalidLoginError
 
 
-class Refresh(flask_restful.Resource):
+class Refresh(Resource):
     @jwt_refresh_token_required
     def post(self):
         user_id = get_jwt_identity()
-        return({'access_token': create_access_token(identity=user_id)}), 200
+        return({'access_token': create_access_token(identity=user_id, fresh=False)}), 200
