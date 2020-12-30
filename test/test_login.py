@@ -23,3 +23,14 @@ class LoginTest(BaseCase):
         response = self.app.post('/login', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(401, response.status_code)
         self.assertEqual(errors['InvalidLoginError']['msg'], response.json['msg'])
+
+
+class RefreshTest(BaseCase):
+    def test_successful_refresh(self):
+        body = json.dumps({'email': 'test@test.ch', 'password': 'test'})
+        response = self.app.post('/login', headers={'Content-Type': 'application/json'}, data=body)
+        refresh_token = response.json['refresh_token']
+        refresh_response = self.app.post('/refresh', headers={'Authorization': 'Bearer ' + refresh_token})
+        self.assertEqual(200, refresh_response.status_code)
+        self.assertIn('access_token', refresh_response.json)
+
