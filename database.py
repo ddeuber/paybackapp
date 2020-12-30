@@ -22,6 +22,8 @@ class User(db.Model):
         if not isinstance(user_dict, dict):
             raise SchemaValidationError
         email = user_dict.get('email')
+        if email is None:
+            raise SchemaValidationError
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
             raise InvalidEmailAddressError
         # Check if email already exists in database

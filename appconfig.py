@@ -5,14 +5,15 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
 from datetime import datetime
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
+
 
 # Initialize app
 app = Flask(__name__)
 
 # Load .env file for environment variables 
-# load_dotenv('.env')
-# Alternative .env file for testing
+# load_dotenv('.env.production')
+# Alternative .env file for testing. This may fail if pipenv loads the .env file!
 load_dotenv('.env.test')
 
 # Import configuration from environment
@@ -24,6 +25,7 @@ app.config['MAIL_USE_TLS'] = bool(int(os.getenv('MAIL_USE_TLS'))) # booleans are
 app.config['MAIL_USE_SSL'] = bool(int(os.getenv('MAIL_USE_SSL')))
 app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+
 
 # Database configuration
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
