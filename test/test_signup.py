@@ -4,7 +4,6 @@ from database import User
 from resources.errors import errors
 
 class SignupTest(BaseCase):
-    
     def test_successful_signup(self):
         email = 'signmeup@test.ch'
         body = json.dumps({'email': email, 'password': 'test'})
@@ -15,15 +14,12 @@ class SignupTest(BaseCase):
         self.user = user
 
     def tearDown(self):
-        try: 
+        if self.user is not None:
             self.db.session.delete(self.user)
             self.db.session.commit()
-        except:
-            print('Could not delete user in tearDown')
-        
+
 
 class BadSignupTest(BaseCase):
-
     def test_bad_email_signup(self):
         email = 'blabla'
         body = json.dumps({'email': email, 'password': 'test'})
