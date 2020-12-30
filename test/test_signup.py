@@ -43,3 +43,10 @@ class BadSignupTest(BaseCase):
         self.assertEqual(400, response.status_code)
         self.assertEqual(errors['SchemaValidationError']['msg'], response.json['msg'])
 
+    def test_email_already_exists_signup(self):
+        body = json.dumps({'email': 'test@test.ch', 'password': 'test'})
+        response = self.app.post('/signup', headers={'Content-Type': 'application/json'}, data=body)
+        self.assertEqual(400, response.status_code)
+        self.assertEqual(errors['EmailAlreadyExistsError']['msg'], response.json['msg'])
+
+
