@@ -44,6 +44,7 @@ class AddTransaction(Resource):
             raise TransactionSchemaError
         return {'added transaction': transaction_from_request}, 201
 
+
 # Get list of all transactions in group
 class TransactionList(Resource):
     @jwt_required
@@ -67,6 +68,7 @@ class TransactionList(Resource):
             transactions.append(t.to_dict())
         return transactions
 
+
 # Upload new transactions and download transaction uploaded after timestamp
 class TransactionUpdate(Resource):
     @jwt_required
@@ -85,7 +87,7 @@ class TransactionUpdate(Resource):
         # Add new transactions
         try:
             for transaction in request_transaction_dict.get('transactions'):
-                add_transaction(transaction, group, user)
+                add_transaction(transaction, group, creator)
             db.session.commit()
         except (IntegrityError, InterfaceError, TypeError):
             raise TransactionSchemaError

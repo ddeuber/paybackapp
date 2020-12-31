@@ -2,6 +2,7 @@ import re
 from flask_sqlalchemy import SQLAlchemy 
 from appconfig import db, bcrypt
 from resources.errors import TimestampTypeError, InvalidEmailAddressError, SchemaValidationError, NoInvolvedError, EmailAlreadyExistsError
+from datetime import datetime
 
 
 # Function for hashing passwords
