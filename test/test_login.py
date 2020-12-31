@@ -16,13 +16,13 @@ class LoginTest(BaseCase):
         body = json.dumps({'email': 'test@test.ch', 'password': 'wrong'})
         response = self.app.post('/login', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(401, response.status_code)
-        self.assertEqual(errors['InvalidLoginError']['message'], response.json['message'])
+        self.assertEqual(errors['InvalidLoginError']['message'], response.json.get('message'))
 
     def test_bad_user(self):
         body = json.dumps({'email': 'new@test.ch', 'password': 'right'})
         response = self.app.post('/login', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(401, response.status_code)
-        self.assertEqual(errors['InvalidLoginError']['message'], response.json['message'])
+        self.assertEqual(errors['InvalidLoginError']['message'], response.json.get('message'))
 
 
 class RefreshTest(BaseCase):

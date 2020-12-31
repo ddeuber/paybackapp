@@ -13,36 +13,29 @@ class SignupTest(BaseCase):
         self.assertIsNotNone(user)
         self.user = user
 
-    def tearDown(self):
-        if self.user is not None:
-            self.db.session.delete(self.user)
-            self.db.session.commit()
-
-
-class BadSignupTest(BaseCase):
     def test_bad_email_signup(self):
         email = 'blabla'
         body = json.dumps({'email': email, 'password': 'test'})
         response = self.app.post('/signup', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(errors['InvalidEmailAddressError']['message'], response.json['message'])
+        self.assertEqual(errors['InvalidEmailAddressError']['message'], response.json.get('message'))
 
     def test_no_email_signup(self):
         body = json.dumps({'password': 'test'})
         response = self.app.post('/signup', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(errors['SchemaValidationError']['message'], response.json['message'])
+        self.assertEqual(errors['SchemaValidationError']['message'], response.json.get('message'))
 
     def test_no_password_signup(self):
         body = json.dumps({'email': 'signmeup@test.ch'})
         response = self.app.post('/signup', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(errors['SchemaValidationError']['message'], response.json['message'])
+        self.assertEqual(errors['SchemaValidationError']['message'], response.json.get('message'))
 
     def test_email_already_exists_signup(self):
         body = json.dumps({'email': 'test@test.ch', 'password': 'test'})
         response = self.app.post('/signup', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(errors['EmailAlreadyExistsError']['message'], response.json['message'])
+        self.assertEqual(errors['EmailAlreadyExistsError']['message'], response.json.get('message'))
 
 

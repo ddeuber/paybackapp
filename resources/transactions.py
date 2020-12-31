@@ -63,7 +63,7 @@ class TransactionList(Resource):
         participant = body.get('participant')
         if participant is not None:
             transaction_query = transaction_query.join(Involved).filter_by(participant=participant)
-        group_transactions = transaction_query.limit(body.get('limit')).offset(body.get('offset'))
+        group_transactions = transaction_query.order_by(Transaction.id.desc()).limit(body.get('limit')).offset(body.get('offset'))
         for t in group_transactions:
             transactions.append(t.to_dict())
         return transactions
@@ -79,18 +79,18 @@ class TransactionUpdate(Resource):
         timestamp = request_transaction_dict.get('timestamp')
         if not isinstance(timestamp, int):
             raise TimestampTypeError
-        # Get transactions added after timestamp
+        # Add new transactions
         group = get_group(group_id)
         user = get_user(get_jwt_identity())
         assert_access_to_group(user.id, group.id)
-        return_transaction_list = [t.to_dict() for t in Transaction.query.join(Group).filter(Group.id==group.id).filter(Transaction.server_timestamp>timestamp)]
-        # Add new transactions
         try:
             for transaction in request_transaction_dict.get('transactions'):
-                add_transaction(transaction, group, creator)
+                add_transaction(transaction, group, user)
             db.session.commit()
         except (IntegrityError, InterfaceError, TypeError):
             raise TransactionSchemaError
+        # Get transactions added after timestamp
+        return_transaction_list = [t.to_dict() for t in Transaction.query.join(Group).filter(Group.id==group.id).filter(Transaction.server_timestamp>timestamp)]
         return {"server_timestamp": int(datetime.now().timestamp()*1000), "transactions": return_transaction_list}
 
 
