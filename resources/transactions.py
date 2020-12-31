@@ -113,3 +113,18 @@ class Debts(Resource):
             output[member]['credit'] = output[member]['spent'] - output[member]['owes']
         return output            
 
+
+# Get all participants of group
+class Participants(Resource):
+    @jwt_required
+    def get(self, group_id):
+        group = get_group(group_id)
+        user = get_user(get_jwt_identity())
+        assert_access_to_group(user.id, group.id)
+        participants = Involved.query.join(Transaction).filter_by(group_id=group_id).with_entities(Involved.participant).distinct()
+        response = {'participants': []}
+        for p in participants:
+            response['participants'].append(p[0])
+        return response 
+
+

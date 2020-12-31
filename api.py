@@ -1,7 +1,7 @@
 from flask_restful import Api
 from appconfig import app
 import sys
-from resources.transactions import TransactionList, TransactionUpdate, AddTransaction, Debts 
+from resources.transactions import TransactionList, TransactionUpdate, AddTransaction, Debts, Participants
 from resources.groups import AddGroup, GetGroupsForUser, AddUserToGroup, LeaveGroup
 from resources.errors import errors
 from resources.login import SignUp, Login, Refresh
@@ -24,6 +24,7 @@ api.add_resource(TransactionList, '/transactions/<int:group_id>')
 api.add_resource(TransactionUpdate, '/update/<int:group_id>')
 api.add_resource(AddTransaction, '/addtransaction/<int:group_id>')
 api.add_resource(Debts, '/debts/<int:group_id>')
+api.add_resource(Participants, '/participants/<int:group_id>')
 
 #### Group endpoints   
 api.add_resource(AddGroup, '/addgroup')
