@@ -25,6 +25,7 @@ app.config['MAIL_USE_TLS'] = bool(int(os.getenv('MAIL_USE_TLS'))) # booleans are
 app.config['MAIL_USE_SSL'] = bool(int(os.getenv('MAIL_USE_SSL')))
 app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
+app.config['PROPAGATE_EXCEPTIONS'] = bool(int(os.getenv('PROPAGATE_EXCEPTIONS')))
 
 
 # Database configuration

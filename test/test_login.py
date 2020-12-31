@@ -1,5 +1,5 @@
 
-from test.basecase import BaseCase
+from test.basecase import BaseCase, LoggedInBaseCase
 import json
 from database import User
 from resources.errors import errors
@@ -25,11 +25,9 @@ class LoginTest(BaseCase):
         self.assertEqual(errors['InvalidLoginError']['message'], response.json.get('message'))
 
 
-class RefreshTest(BaseCase):
+class RefreshTest(LoggedInBaseCase):
     def test_successful_refresh(self):
-        body = json.dumps({'email': 'test@test.ch', 'password': 'test'})
-        response = self.app.post('/login', headers={'Content-Type': 'application/json'}, data=body)
-        refresh_token = response.json['refresh_token']
+        refresh_token = self.refresh_token
         refresh_response = self.app.post('/refresh', headers={'Authorization': 'Bearer ' + refresh_token})
         self.assertEqual(200, refresh_response.status_code)
         self.assertIn('access_token', refresh_response.json)

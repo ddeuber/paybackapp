@@ -1,4 +1,4 @@
 payapp_database.db
 __pycache__/
-.env.production
+.env*
 *.swp

@@ -35,6 +35,7 @@ class LoggedInBaseCase(BaseCase):
         body = json.dumps({'email': self.email, 'password': 'test'})
         response = self.app.post('/login', headers={'Content-Type': 'application/json'}, data=body)
         self.token = response.json['access_token']
+        self.refresh_token = response.json['refresh_token']
 
     
 
