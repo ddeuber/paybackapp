@@ -11,8 +11,8 @@ from sqlalchemy.exc import IntegrityError, InterfaceError
 ### Utility functions
 
 # Adds single transaction to database without commit.
-def add_transaction(transaction, group):
-    transaction_for_database = Transaction(transaction, group)
+def add_transaction(transaction, group, creator):
+    transaction_for_database = Transaction(transaction, group, creator)
     db.session.add(transaction_for_database)
     # Add involved
     at_least_one_participant = False
@@ -38,7 +38,7 @@ class AddTransaction(Resource):
         user = get_user(get_jwt_identity())
         assert_access_to_group(user.id, group.id)
         try:
-            add_transaction(transaction_from_request, group)
+            add_transaction(transaction_from_request, group, user)
             db.session.commit()
         except (IntegrityError, InterfaceError):
             raise TransactionSchemaError
@@ -85,7 +85,7 @@ class TransactionUpdate(Resource):
         # Add new transactions
         try:
             for transaction in request_transaction_dict.get('transactions'):
-                add_transaction(transaction, group)
+                add_transaction(transaction, group, user)
             db.session.commit()
         except (IntegrityError, InterfaceError, TypeError):
             raise TransactionSchemaError

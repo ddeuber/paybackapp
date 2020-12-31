@@ -61,7 +61,6 @@ class GroupAccess(db.Model):
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    creator = db.Column(db.String(36), nullable=False) # TODO: determine if this might be replaced with reference to user table
     payer = db.Column(db.String(80), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     comment = db.Column(db.String(80), nullable=False)
@@ -69,11 +68,12 @@ class Transaction(db.Model):
     server_timestamp = db.Column(db.Integer, nullable=False, index=True)
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
     group = db.relationship('Group', backref='transactions')
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    creator = db.relationship('User', backref='transactions_created')
 
-    def __init__(self, transaction_dict, group):
+    def __init__(self, transaction_dict, group, creator):
         if not isinstance(transaction_dict, dict):
             raise SchemaValidationError
-        self.creator=transaction_dict.get('creator')
         self.payer=transaction_dict.get('payer')
         self.amount=transaction_dict.get('amount')
         self.comment=transaction_dict.get('comment')
@@ -82,6 +82,7 @@ class Transaction(db.Model):
         self.creation_timestamp=transaction_dict.get('timestamp')
         self.server_timestamp=int(datetime.now().timestamp()*1000)
         self.group = group 
+        self.creator = creator
 
     def to_dict(self):
         participants = []
@@ -91,7 +92,7 @@ class Transaction(db.Model):
             raise NoInvolvedError 
         return {
             #'id': self.id,
-            'creator': self.creator,
+            'creator': self.creator.email,
             'payer': self.payer,
             'amount': self.amount,
             'comment': self.comment,
