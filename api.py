@@ -35,11 +35,4 @@ api.add_resource(LeaveGroup, '/leavegroup/<int:group_id>')
 #TODO: create endpoint to list participants of a group
 
 if __name__ == '__main__':
-    if len(sys.argv) == 3:
-        tls_context = (sys.argv[1], sys.argv[2])
-        app.run(host='::', debug=True, ssl_context=tls_context) 
-    else:
-        print('NOT USING HTTPS')
-        print('use this command to enable HTTPS:')
-        print('\t python3 api.py /path/to/cert /path/to/privkey')
-        app.run(host='::', debug=True)
+    app.run(host='::', debug=True)
