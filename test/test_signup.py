@@ -25,24 +25,24 @@ class BadSignupTest(BaseCase):
         body = json.dumps({'email': email, 'password': 'test'})
         response = self.app.post('/signup', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(errors['InvalidEmailAddressError']['msg'], response.json['msg'])
+        self.assertEqual(errors['InvalidEmailAddressError']['message'], response.json['message'])
 
     def test_no_email_signup(self):
         body = json.dumps({'password': 'test'})
         response = self.app.post('/signup', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(errors['SchemaValidationError']['msg'], response.json['msg'])
+        self.assertEqual(errors['SchemaValidationError']['message'], response.json['message'])
 
     def test_no_password_signup(self):
         body = json.dumps({'email': 'signmeup@test.ch'})
         response = self.app.post('/signup', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(errors['SchemaValidationError']['msg'], response.json['msg'])
+        self.assertEqual(errors['SchemaValidationError']['message'], response.json['message'])
 
     def test_email_already_exists_signup(self):
         body = json.dumps({'email': 'test@test.ch', 'password': 'test'})
         response = self.app.post('/signup', headers={'Content-Type': 'application/json'}, data=body)
         self.assertEqual(400, response.status_code)
-        self.assertEqual(errors['EmailAlreadyExistsError']['msg'], response.json['msg'])
+        self.assertEqual(errors['EmailAlreadyExistsError']['message'], response.json['message'])
 
 

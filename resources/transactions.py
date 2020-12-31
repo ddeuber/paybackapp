@@ -112,3 +112,4 @@ class Debts(Resource):
         for member in output:
             output[member]['credit'] = output[member]['spent'] - output[member]['owes']
         return output            
+

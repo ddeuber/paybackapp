@@ -54,71 +54,71 @@ class BadTokenError(HTTPException):
 
 errors = {
     'NoInvolvedError': {
-        'msg': 'There must be at least one participant involved',
+        'message': 'There must be at least one participant involved',
         'status': 400
     },
     'InvolvedNotIterableError': {
-        'msg': 'Involved must be a list',
+        'message': 'Involved must be a list',
         'status': 400
     },
     'GroupNotFoundError': {
-        'msg': 'Group not found',
+        'message': 'Group not found',
         'status': 400
     },
     'NoAccessToGroupError': {
-        'msg': 'User is not authorized to access group',
+        'message': 'User is not authorized to access group',
         'status': 403
     },
     'UserNotFoundError': {
-        'msg': 'User not found',
+        'message': 'User not found',
         'status': 400
     },
     'UserAlreadyInGroup': {
-        'msg': 'User has already access to group',
+        'message': 'User has already access to group',
         'status': 400
     },
     'InvalidGroupNameError': {
-        'msg': 'Group name is not valid',
+        'message': 'Group name is not valid',
         'status': 400
     },
     'TimestampTypeError': {
-        'msg': 'Timestamp is not an integer',
+        'message': 'Timestamp is not an integer',
         'status': 400
     },
     'TransactionSchemaError': {
-        'msg': 'Error in transaction(s) JSON',
+        'message': 'Error in transaction(s) JSON',
         'status' : 400
     },
     'InternalServerError': {
-        'msg': 'Something went wrong',
+        'message': 'Something went wrong',
         'status': 500
     },
     'SchemaValidationError': {
-        'msg': 'JSON object is not correctly structured',
+        'message': 'JSON object is not correctly structured',
         'status': 400
     },
     'EmailAlreadyExistsError': {
-        'msg': 'User with given email address already exists',
+        'message': 'User with given email address already exists',
         'status': 400
     },
     'EmailDoesNotExistError': {
-        'msg': 'User with given email address does not exist',
+        'message': 'User with given email address does not exist',
         'status': 400
     },
     'InvalidEmailAddressError': {
-        'msg': 'Email address is not valid',
+        'message': 'Email address is not valid',
         'status': 400
     },
     'UnauthorizedError': {
-        'msg': 'Not authorized',
+        'message': 'Not authorized',
         'status': 401
     },
     'InvalidLoginError': {
-        'msg': 'Invalid username or password',
+        'message': 'Invalid username or password',
         'status': 401
     },
     'BadTokenError': {
-        'msg': 'Invalid token',
+        'message': 'Invalid token',
         'status': 403
     }
 }
