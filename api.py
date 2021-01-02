@@ -35,4 +35,4 @@ api.add_resource(LeaveGroup, '/leavegroup/<int:group_id>')
 #TODO: create endpoint to list participants of a group
 
 if __name__ == '__main__':
-    app.run(host='::', debug=True)
+    app.run(host='::', port=6000, debug=False)

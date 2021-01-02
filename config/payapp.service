@@ -1,0 +1,16 @@
+[Unit]
+Description = PayApp
+After = network.target
+
+[Service]
+PermissionsStartOnly = true
+User = payapp
+Group = www-data
+WorkingDirectory = /home/payapp/paybackapp/
+ExecStart = /usr/local/bin/pipenv run python3.8 api.py
+
+StandardOutput=file:/home/payapp/payapp_output.log
+StandardError=file:/home/payapp/payapp_error.log
+
+[Install]
+WantedBy = multi-user.target
