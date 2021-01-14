@@ -48,7 +48,7 @@ class AddTransaction(Resource):
 # Get list of all transactions in group
 class TransactionList(Resource):
     @jwt_required
-    def get(self, group_id):
+    def post(self, group_id):
         body = flask.request.get_json(force=True) # body contains optional filter parameters payer, participant, limit and offset
         if not isinstance(body, dict):
            raise SchemaValidationError

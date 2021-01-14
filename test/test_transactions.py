@@ -20,7 +20,7 @@ class GetTransactionListTest(LoggedInBaseCase):
     def get_transaction_list(self, filters, expected_response):
         body = json.dumps(filters)
         group_id = 1
-        response = self.app.get('/transactions/' + str(group_id), headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + self.token}, data=body)
+        response = self.app.post('/transactions/' + str(group_id), headers={'Content-Type': 'application/json', 'Authorization': 'Bearer ' + self.token}, data=body)
         self.assertEqual(200, response.status_code)
         self.assertEqual(expected_response, response.json)
 
