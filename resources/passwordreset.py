@@ -39,13 +39,15 @@ class ForgotPassword(Resource):
         if not user:
             raise EmailDoesNotExistError
         reset_token = create_access_token(user.id, fresh=True)
+        url = flask.request.host_url + "resetpassword.html?" + reset_token
+        print(url)
         send_email('[PayApp] Reset Your Password',
                             sender='payappnoreply@gmail.com',
                             recipients=[user.email],
                             text_body=flask.render_template('reset_password.txt',
-                                                    token=reset_token),
+                                                    url=url),
                             html_body=flask.render_template('reset_password.html',
-                                                    token=reset_token))
+                                                    url=url))
         return {'message': 'Email for password reset will be sent shortly'}
 
 
