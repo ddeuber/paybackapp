@@ -1,0 +1,32 @@
+from croniter import croniter
+from datetime import datetime
+from database import db, StandingOrder, Transaction, Involved
+
+def execute_standing_orders():
+    print('Starting standing orders job.')
+    standing_orders = StandingOrder.query.all()
+    for standing_order in standing_orders:
+        execute_standing_order(standing_order)
+    print('Finished standing orders job.')
+
+
+def execute_standing_order(standing_order):
+    last_execution = datetime.fromtimestamp(standing_order.get_last_execution_or_fallback()/1000)
+    # Get the next execution date
+    cron_iter = croniter(standing_order.cron_expression, last_execution)
+    now = datetime.now()
+    if now >= cron_iter.get_next(datetime):
+        timestamp = int(now.timestamp()*1000)
+        standing_order.last_execution = timestamp
+
+        # Generate transaction from standing order
+        transaction = Transaction(standing_order)
+        db.session.add(transaction)
+
+        if not standing_order.involved:
+            raise NoInvolvedError
+        for standing_order_involved in standing_order.involved: 
+            involved = Involved(transaction=transaction, participant=standing_order_involved.participant)
+            db.session.add(involved)
+
+        db.session.commit()
