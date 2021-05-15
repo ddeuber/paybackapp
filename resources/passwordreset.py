@@ -7,7 +7,7 @@ from flask_mail import Message
 from threading import Thread
 from resources.errors import SchemaValidationError, EmailDoesNotExistError, BadTokenError
 from resources.login import get_user
-from flask_jwt_extended import create_access_token, fresh_jwt_required, get_jwt_identity
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 from jwt.exceptions import ExpiredSignatureError, DecodeError, InvalidTokenError
 
 
@@ -51,7 +51,7 @@ class ForgotPassword(Resource):
 
 # Reset password with access token 
 class ResetPassword(Resource):
-    @fresh_jwt_required
+    @jwt_required(fresh=True)
     def post(self):
         body = flask.request.get_json(force=True)
         if not isinstance(body, dict):
