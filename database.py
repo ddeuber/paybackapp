@@ -1,5 +1,5 @@
 import re
-from flask_sqlalchemy import SQLAlchemy 
+from flask_sqlalchemy import SQLAlchemy
 from appconfig import db, bcrypt
 from resources.errors import TimestampTypeError, InvalidEmailAddressError, SchemaValidationError, NoInvolvedError, EmailAlreadyExistsError
 from datetime import datetime
@@ -124,6 +124,7 @@ class Involved(db.Model):
 class StandingOrder(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cron_expression = db.Column(db.String(80), nullable=False) 
+    periodicity = db.Column(db.String(80), nullable=False)
     last_execution = db.Column(db.Integer, nullable=True)
     payer = db.Column(db.String(80), nullable=False)
     amount = db.Column(db.Float, nullable=False)
@@ -139,13 +140,14 @@ class StandingOrder(db.Model):
         for involved_entry in self.involved:
             participants.append(involved_entry.participant)
         return {
+            'id': self.id,
             'creator': self.creator.email,
             'payer': self.payer,
             'amount': self.amount,
             'comment': self.comment,
             'timestamp': self.creation_timestamp,
             'involved': participants,
-            'cron_expression':  self.cron_expression,
+            'periodicity': self.periodicity,
             'last_execution_timestamp': self.last_execution
         }
 
@@ -156,8 +158,9 @@ class StandingOrder(db.Model):
         return self.last_execution
 
 
+# TODO: cascade deletes of standing order
 class StandingOrderInvolved(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     participant = db.Column(db.String(80), nullable=False)
-    standing_order_id = db.Column(db.Integer, db.ForeignKey('standing_order.id'), nullable=False, index=True)
-    standing_order = db.relationship('StandingOrder', backref='involved')
+    standing_order_id = db.Column(db.Integer, db.ForeignKey('standing_order.id', ondelete='CASCADE'), nullable=False, index=True)
+    standing_order = db.relationship('StandingOrder', backref=db.backref('involved', passive_deletes=True))

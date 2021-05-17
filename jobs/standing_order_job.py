@@ -11,9 +11,8 @@ def execute_standing_orders():
 
 
 def execute_standing_order(standing_order):
-    last_execution = datetime.fromtimestamp(standing_order.get_last_execution_or_fallback()/1000)
     # Get the next execution date
-    cron_iter = croniter(standing_order.cron_expression, last_execution)
+    cron_iter = get_cron_iter(standing_order)
     now = datetime.now()
     if now >= cron_iter.get_next(datetime):
         timestamp = int(now.timestamp()*1000)
@@ -30,3 +29,9 @@ def execute_standing_order(standing_order):
             db.session.add(involved)
 
         db.session.commit()
+
+
+def get_cron_iter(standing_order):
+    last_execution = datetime.fromtimestamp(standing_order.get_last_execution_or_fallback()/1000)
+    return croniter(standing_order.cron_expression, last_execution)
+    

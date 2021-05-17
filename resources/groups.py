@@ -25,7 +25,7 @@ def assert_access_to_group(user_id, group_id):
 ### Endpoints
 
 class AddGroup(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self):
         user = get_user(get_jwt_identity())
         group_from_request = flask.request.get_json(force=True)
@@ -44,7 +44,7 @@ class AddGroup(Resource):
 
 # Returns the list of groups where the user is a member
 class GetGroupsForUser(Resource):
-     @jwt_required
+     @jwt_required()
      def get(self):
         user = get_user(get_jwt_identity())
         groups = []
@@ -55,7 +55,7 @@ class GetGroupsForUser(Resource):
 
 # Add another member to group by his email
 class AddUserToGroup(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self, group_id):
         # First check if user and group exist
         user = get_user(get_jwt_identity())
@@ -81,7 +81,7 @@ class AddUserToGroup(Resource):
 
 
 class LeaveGroup(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self, group_id):
         # First check if user and group exist
         user = get_user(get_jwt_identity())
