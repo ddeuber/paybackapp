@@ -20,7 +20,7 @@ def add_standing_order(standing_order_dict, group, creator):
     standing_order.group = group
     standing_order.creator = creator
 
-    ## TODO: cron expression parsing
+    # Generate cron expression
     standing_order.periodicity = standing_order_dict.get('periodicity')
     if standing_order.periodicity == 'monthly':
         if isinstance(standing_order_dict.get('day'), int) and standing_order_dict.day >= 0 and standing_order_dict <= 28:
@@ -64,8 +64,8 @@ def create_standing_order_from_dict(standing_order_dict):
 
 ### Resources 
 
-# Add a standing order
 class StandingOrders(Resource):
+    # Add a standing order
     @jwt_required()
     def post(self, group_id):
         standing_order_dict = flask.request.get_json(force=True)
@@ -100,7 +100,7 @@ class StandingOrders(Resource):
                 next_execution = cron_iter.get_next(datetime)
                 standing_order_dict['next_executions'].append(int(next_execution.timestamp()*1000))
             standing_orders.append(standing_order_dict)
-        return standing_order_dict
+        return standing_orders 
 
 
 class DeleteStandingOrder(Resource):
@@ -117,7 +117,6 @@ class DeleteStandingOrder(Resource):
         user = get_user(get_jwt_identity())
         assert_access_to_group(user.id, group.id)
 
-        # TODO: this does not delete involved, why??
         db.session.delete(standing_order)
         db.session.commit()
         return {'msg': 'successfully deleted standing order'}

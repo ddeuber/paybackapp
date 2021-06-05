@@ -158,9 +158,8 @@ class StandingOrder(db.Model):
         return self.last_execution
 
 
-# TODO: cascade deletes of standing order
 class StandingOrderInvolved(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     participant = db.Column(db.String(80), nullable=False)
     standing_order_id = db.Column(db.Integer, db.ForeignKey('standing_order.id', ondelete='CASCADE'), nullable=False, index=True)
-    standing_order = db.relationship('StandingOrder', backref=db.backref('involved', passive_deletes=True))
+    standing_order = db.relationship('StandingOrder', backref=db.backref('involved', cascade='all,delete'))
