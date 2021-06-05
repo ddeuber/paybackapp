@@ -31,7 +31,7 @@ def add_transaction(transaction, group, creator):
 
 # Add a single transaction
 class AddTransaction(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self, group_id):
         transaction_from_request = flask.request.get_json(force=True)
         group = get_group(group_id)

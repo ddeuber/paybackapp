@@ -19,7 +19,8 @@ def execute_standing_order(standing_order):
         standing_order.last_execution = timestamp
 
         # Generate transaction from standing order
-        transaction = Transaction(standing_order)
+        transaction = Transaction()
+        transaction.fillWithStandingOrder(standing_order)
         db.session.add(transaction)
 
         if not standing_order.involved:

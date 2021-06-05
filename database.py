@@ -74,7 +74,11 @@ class Transaction(db.Model):
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     creator = db.relationship('User', backref='transactions_created')
 
-    def __init__(self, transaction_dict, group, creator):
+    def __init__(self, transaction_dict=None, group=None, creator=None):
+        # empty constructor
+        if transaction_dict is None or group is None or creator is None:
+            return
+
         if not isinstance(transaction_dict, dict):
             raise SchemaValidationError
         self.payer=transaction_dict.get('payer')
@@ -89,7 +93,7 @@ class Transaction(db.Model):
 
     # Create transaction from standing order. Note that the involved have to be added separately to the database.
     # Make sure to call this function after the last_execution has been updated to the current time as it will be used for the timestamps in the transaction.
-    def __init__(self, standing_order):
+    def fillWithStandingOrder(self, standing_order):
         self.payer = standing_order.payer
         self.amount = standing_order.amount
         self.comment = standing_order.comment
