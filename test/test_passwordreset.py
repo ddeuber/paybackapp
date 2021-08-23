@@ -11,7 +11,7 @@ class ForgotPasswordTest(BaseCase):
             body = json.dumps({'email': 'test@test.ch'})
             response = self.app.post('/forgotpassword', data=body)
             self.assertEqual(200, response.status_code)
-            time.sleep(2) # wait for mail to be sent
+            time.sleep(5) # wait for mail to be sent
             self.assertEqual(1, len(outbox))
 
 class ChangePasswordTest(LoggedInBaseCase):

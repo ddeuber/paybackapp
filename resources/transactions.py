@@ -18,7 +18,7 @@ def add_transaction(transaction, group, creator):
     at_least_one_participant = False
     participants = transaction.get('involved')
     if not isinstance(participants, list):
-        raise SchemaValidationError
+        raise InvolvedNotIterableError 
     for participant in participants: 
         at_least_one_participant = True
         involved = Involved(transaction=transaction_for_database, participant=participant)
@@ -31,7 +31,7 @@ def add_transaction(transaction, group, creator):
 
 # Add a single transaction
 class AddTransaction(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self, group_id):
         transaction_from_request = flask.request.get_json(force=True)
         group = get_group(group_id)
@@ -47,7 +47,7 @@ class AddTransaction(Resource):
 
 # Get list of all transactions in group
 class TransactionList(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self, group_id):
         body = flask.request.get_json(force=True) # body contains optional filter parameters payer, participant, limit and offset
         if not isinstance(body, dict):
@@ -71,7 +71,7 @@ class TransactionList(Resource):
 
 # Upload new transactions and download transaction uploaded after timestamp
 class TransactionUpdate(Resource):
-    @jwt_required
+    @jwt_required()
     def post(self, group_id):
         request_transaction_dict = flask.request.get_json(force=True)
         if not isinstance(request_transaction_dict, dict):
@@ -96,7 +96,7 @@ class TransactionUpdate(Resource):
 
 # Calculate depts for each participant
 class Debts(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self, group_id):
         output = {}
         group = get_group(group_id)
@@ -118,7 +118,7 @@ class Debts(Resource):
 
 # Get all participants of group
 class Participants(Resource):
-    @jwt_required
+    @jwt_required()
     def get(self, group_id):
         group = get_group(group_id)
         user = get_user(get_jwt_identity())

@@ -52,6 +52,12 @@ class InvalidLoginError(HTTPException):
 class BadTokenError(HTTPException):
     pass
 
+class EntityNotFoundError(HTTPException):
+    pass
+
+class EntityNotInGroupError(HTTPException):
+    pass
+
 errors = {
     'NoInvolvedError': {
         'message': 'There must be at least one participant involved',
@@ -120,5 +126,13 @@ errors = {
     'BadTokenError': {
         'message': 'Invalid token',
         'status': 403
+    },
+    'EntityNotFoundError': {
+        'message': 'Entity not found',
+        'status': 400
+    },
+    'EntityNotInGroupError': {
+        'message': 'Entity not found in this group',
+        'status': 400
     }
 }

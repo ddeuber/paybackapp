@@ -6,6 +6,10 @@ from resources.groups import AddGroup, GetGroupsForUser, AddUserToGroup, LeaveGr
 from resources.errors import errors
 from resources.login import SignUp, Login, Refresh
 from resources.passwordreset import ResetPassword, ForgotPassword
+from resources.standingorders import StandingOrders, DeleteStandingOrder
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
+from jobs.standing_order_job import execute_standing_orders
 
 
 api = Api(app, errors=errors)
@@ -32,6 +36,20 @@ api.add_resource(GetGroupsForUser, '/groups')
 api.add_resource(AddUserToGroup, '/addusertogroup/<int:group_id>')
 api.add_resource(LeaveGroup, '/leavegroup/<int:group_id>')
 
+#### Standing order endpoints
+api.add_resource(StandingOrders, '/standingorders/<int:group_id>')
+api.add_resource(DeleteStandingOrder, '/standingorders/<int:group_id>/<int:standing_order_id>')
+
 
 if __name__ == '__main__':
-    app.run(host='::', port=6000, debug=False)
+    # Setup jobs
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=execute_standing_orders, trigger="interval", hours=1)
+    scheduler.start()
+
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
+
+    # Run app 
+    app.run(host='::', port=5000, debug=True)
+
