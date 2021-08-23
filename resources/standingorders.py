@@ -23,16 +23,18 @@ def add_standing_order(standing_order_dict, group, creator):
     # Generate cron expression
     standing_order.periodicity = standing_order_dict.get('periodicity')
     if standing_order.periodicity == 'monthly':
-        if isinstance(standing_order_dict.get('day'), int) and standing_order_dict.day >= 0 and standing_order_dict <= 28:
-            standing_order.cron_expression = '0 0 {0} * *'.format(standing_order_dict.day)
+        if isinstance(standing_order_dict.get('day'), int) and standing_order_dict.get('day') >= 0 and standing_order_dict.get('day') <= 28:
+            standing_order.cron_expression = '0 0 {0} * *'.format(standing_order_dict.get('day'))
         elif standing_order_dict.get('day') is None:
             standing_order.cron_expression = '0 0 l * *'
         else:
             raise SchemaValidationError
     elif standing_order.periodicity == 'quarterly':
-        standing_order.cron_expression = '0 0 1 1/4 *'
+        standing_order.cron_expression = '0 0 1 */3 *'
     elif standing_order.periodiciy ==  'yearly': 
         standing_order.cron_expression = '0 0 1 1 *'
+    else:
+        raise SchemaValidationError
 
     db.session.add(standing_order)
 
