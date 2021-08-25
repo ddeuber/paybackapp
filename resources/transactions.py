@@ -127,6 +127,11 @@ class Participants(Resource):
         response = {'participants': []}
         for p in participants:
             response['participants'].append(p[0])
+        payers = Transaction.query.filter_by(group_id=group_id).with_entities(Transaction.payer).distinct()
+        participants_set = set(response['participants'])
+        for payer in payers:
+            if payer[0] not in participants_set:
+                response['participants'].append(payer[0])
         return response 
 
 
