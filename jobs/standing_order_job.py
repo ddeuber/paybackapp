@@ -11,10 +11,12 @@ def execute_standing_orders():
 
 
 def execute_standing_order(standing_order):
+    print('Check standing order' + str(standing_order.to_dict()))
     # Get the next execution date
     cron_iter = get_cron_iter(standing_order)
     now = datetime.now()
     if now >= cron_iter.get_next(datetime):
+        print('Add transaction for standing order' + str(standing_order.to_dict()))
         timestamp = int(now.timestamp()*1000)
         standing_order.last_execution = timestamp
 
