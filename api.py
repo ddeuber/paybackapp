@@ -44,7 +44,7 @@ api.add_resource(DeleteStandingOrder, '/standingorders/<int:group_id>/<int:stand
 
 # Setup jobs
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=execute_standing_orders, args=[app.logger], trigger="interval", minutes=1)
+scheduler.add_job(func=execute_standing_orders, args=[app.logger], trigger="interval", hours=1)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
