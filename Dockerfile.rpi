@@ -1,11 +1,12 @@
 # syntax=docker/dockerfile:1
 
-FROM balenalib/raspberry-pi-python:3.8-buster-20210705
+FROM balenalib/raspberry-pi-python:3.8
 
 WORKDIR /app
 
 COPY Pipfile Pipfile.lock ./
 
+RUN apt update && apt install python3-dev gcc libc-dev libffi-dev
 RUN pip install pipenv
 RUN pip install gunicorn 
 RUN pipenv install --system --deploy
