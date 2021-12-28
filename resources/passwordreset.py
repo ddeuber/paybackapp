@@ -40,7 +40,7 @@ class ForgotPassword(Resource):
             raise EmailDoesNotExistError
         reset_token = create_access_token(user.id, fresh=True)
         send_email('[PayApp] Reset Your Password',
-                            sender='payappnoreply@gmail.com',
+                            sender=app.config['MAIL_USERNAME'],
                             recipients=[user.email],
                             text_body=flask.render_template('reset_password.txt',
                                                     token=reset_token),
