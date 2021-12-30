@@ -2,22 +2,23 @@ from croniter import croniter
 from datetime import datetime
 from database import db, StandingOrder, Transaction, Involved
 
-def execute_standing_orders():
-    print('Starting standing orders job.')
+def execute_standing_orders(logger):
+    logger.info('Starting standing orders job.')
     standing_orders = StandingOrder.query.all()
     for standing_order in standing_orders:
-        execute_standing_order(standing_order)
-    print('Finished standing orders job.')
+        execute_standing_order(standing_order, logger)
+    logger.info('Finished standing orders job.')
 
 
-def execute_standing_order(standing_order):
-    print('Check standing order' + str(standing_order.to_dict()))
+def execute_standing_order(standing_order, logger):
+    logger.info('Check standing order' + str(standing_order.to_dict()))
     # Get the next execution date
     cron_iter = get_cron_iter(standing_order)
     now = datetime.now()
     if now >= cron_iter.get_next(datetime):
-        print('Add transaction for standing order' + str(standing_order.to_dict()))
+        logger.info('Add transaction for standing order' + str(standing_order.to_dict()))
         timestamp = int(now.timestamp()*1000)
+        previous_last_execution = standing_order.last_execution
         standing_order.last_execution = timestamp
 
         # Generate transaction from standing order

@@ -1,4 +1,5 @@
 from flask_restful import Api
+import logging
 from appconfig import app
 import sys
 from resources.transactions import TransactionList, TransactionUpdate, AddTransaction, Debts, Participants
@@ -41,15 +42,21 @@ api.add_resource(StandingOrders, '/standingorders/<int:group_id>')
 api.add_resource(DeleteStandingOrder, '/standingorders/<int:group_id>/<int:standing_order_id>')
 
 
+# Setup jobs
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=execute_standing_orders, args=[app.logger], trigger="interval", hours=1)
+scheduler.start()
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
+
+
 if __name__ == '__main__':
-    # Setup jobs
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=execute_standing_orders, trigger="interval", hours=1)
-    scheduler.start()
-
-    # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
-
     # Run app 
-    app.run(host='::', port=6000, debug=True, use_reloader=False)
+    app.run(host='::', port=5000, debug=False, use_reloader=False)
 
+# Enable logging if started by Gunicorn
+if __name__ != '__main__':
+    gunicorn_logger = logging.getLogger('gunicorn.error')
+    app.logger.handlers = gunicorn_logger.handlers
+    app.logger.setLevel(gunicorn_logger.level)
