@@ -113,7 +113,8 @@ class Debts(Resource):
                 output[member]['owes'] += t_dict['amount'] / len(t_dict['involved'])
         for member in output:
             output[member]['credit'] = output[member]['spent'] - output[member]['owes']
-        return output            
+            output[member]['participant'] = member
+        return list(output.values())
 
 
 # Get all participants of group
