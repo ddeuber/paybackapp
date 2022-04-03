@@ -31,7 +31,7 @@ def add_standing_order(standing_order_dict, group, creator):
             raise SchemaValidationError
     elif standing_order.periodicity == 'quarterly':
         standing_order.cron_expression = '0 0 1 */3 *'
-    elif standing_order.periodiciy ==  'yearly': 
+    elif standing_order.periodicity ==  'yearly': 
         standing_order.cron_expression = '0 0 1 1 *'
     else:
         raise SchemaValidationError
