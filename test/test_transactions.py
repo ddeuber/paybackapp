@@ -85,7 +85,9 @@ class DebtTest(LoggedInBaseCase):
         group_id = 1
         response = self.app.get('/debts/' + str(group_id), headers={'Authorization': 'Bearer ' + self.token})
         self.assertEqual(200, response.status_code)
-        expected_response = {'osmaan': {'spent': 100.0, 'owes': 145.0, 'credit': -45.0}, 'fetteli': {'spent': 210.0, 'owes': 145.0, 'credit': 65.0}, "hell's angels": {'spent': 0, 'owes': 20.0, 'credit': -20.0}}
+        expected_response = [{'participant': 'osmaan', 'spent': 100.0, 'owes': 145.0, 'credit': -45.0}, 
+        {'participant': 'fetteli', 'spent': 210.0, 'owes': 145.0, 'credit': 65.0}, 
+        {'participant': "hell's angels", 'spent': 0, 'owes': 20.0, 'credit': -20.0}]
         self.assertEqual(expected_response, response.json)
 
 
