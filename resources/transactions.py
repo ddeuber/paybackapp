@@ -7,6 +7,7 @@ from resources.errors import TransactionSchemaError, NoInvolvedError, InvolvedNo
 from resources.groups import get_group, assert_access_to_group
 from resources.login import get_user
 from sqlalchemy.exc import IntegrityError, InterfaceError
+from sqlalchemy.sql import func
 
 ### Utility functions
 
@@ -98,23 +99,41 @@ class TransactionUpdate(Resource):
 class Debts(Resource):
     @jwt_required()
     def get(self, group_id):
-        output = {}
+        output = dict()
         group = get_group(group_id)
         user = get_user(get_jwt_identity())
         assert_access_to_group(user.id, group.id)
-        for t in group.transactions:
-            t_dict = t.to_dict()
-            # create entry for every member that's not yet in output
-            for member in [t_dict['payer']] + t_dict['involved']:
-                if member not in output:
-                    output[member] = {'spent': 0, 'owes': 0}
-            output[t_dict['payer']]['spent'] += t_dict['amount']
-            for member in t_dict['involved']:
-                output[member]['owes'] += t_dict['amount'] / len(t_dict['involved'])
-        for member in output:
-            output[member]['credit'] = output[member]['spent'] - output[member]['owes']
-            output[member]['participant'] = member
+        spent_per_participant = calculate_spent_per_participant(group)
+        owes_per_participant = calculate_owes_per_participant(group)
+        participants = list(set(spent_per_participant.keys()).union(owes_per_participant.keys()))
+        participants.sort()
+        for participant in participants:
+            output[participant] = dict()
+            output[participant]['spent'] = spent_per_participant[participant] if participant in spent_per_participant else 0
+            output[participant]['owes'] = owes_per_participant[participant] if participant in owes_per_participant else 0
+            output[participant]['credit'] = output[participant]['spent'] - output[participant]['owes']
+            output[participant]['participant'] = participant
         return list(output.values())
+
+
+def calculate_spent_per_participant(group):
+    spent_as_tuple = db.session.query(
+            Transaction.payer, func.sum(Transaction.amount).label('spent')
+            ).filter_by(group_id=group.id).group_by(Transaction.payer).all()
+    return {spent_tuple[0]:spent_tuple[1] for spent_tuple in spent_as_tuple}
+
+def calculate_owes_per_participant(group):
+    number_of_involved_per_transaction = db.session.query(
+            Transaction.id, func.count(Involved.id).label('count')
+            ).join(Transaction.involved).group_by(Transaction.id).subquery()
+    owes_as_tuples = db.session.query(
+            Involved.participant, 
+            func.sum(Transaction.amount/number_of_involved_per_transaction.c.count).label('owes'),
+            ).join(Transaction.involved).filter(Transaction.group_id==group.id).join(
+                    number_of_involved_per_transaction, 
+                    Transaction.id==number_of_involved_per_transaction.c.id
+            ).group_by(Involved.participant).all()
+    return {owes_tuple[0]:owes_tuple[1] for owes_tuple in owes_as_tuples}
 
 
 # Get all participants of group
@@ -124,7 +143,7 @@ class Participants(Resource):
         group = get_group(group_id)
         user = get_user(get_jwt_identity())
         assert_access_to_group(user.id, group.id)
-        participants = Involved.query.join(Transaction).filter_by(group_id=group_id).with_entities(Involved.participant).distinct()
+        participants = get_participants_of_group(group)
         response = {'participants': []}
         for p in participants:
             response['participants'].append(p[0])
@@ -134,5 +153,8 @@ class Participants(Resource):
             if payer[0] not in participants_set:
                 response['participants'].append(payer[0])
         return response 
+
+def get_participants_of_group(group):
+        return Involved.query.join(Transaction).filter_by(group_id=group.id).with_entities(Involved.participant).distinct()
 
 
