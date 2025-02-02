@@ -10,4 +10,4 @@ RUN pip install pipenv
 RUN pip install gunicorn 
 RUN pipenv install --system --deploy
 
-CMD [ "gunicorn", "api:app", "-w", "2", "--threads", "2", "-b", "0.0.0.0:6000", "--error-logfile", "payapp_output.log", "--preload"]
+CMD [ "gunicorn", "api:app", "-w", "2", "--threads", "2", "-b", "0.0.0.0:5000"]

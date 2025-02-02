@@ -1,0 +1,28 @@
+services:
+  paybackapp:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    restart: always
+    depends_on:
+      dbinit:
+          condition: service_completed_successfully
+
+  dbinit:
+    build: .
+    volumes:
+      - .:/app
+    entrypoint: /bin/bash
+    # yamllint disable rule:line-length
+    command:
+      - -c
+      - |
+        if [ ! -f "payapp_database.db" ]; then
+          echo "payapp_database.db does not exist. Running the initialization script..."
+          python init_database.py 
+          echo "Initialization complete."
+        else
+          echo "Database already exists. Skipping initialization."
+        fi

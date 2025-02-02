@@ -2,16 +2,11 @@
 
 ## Deployment
 
-In order to build a docker image running the application with gunicorn execute:
+To start the server, create an `.env` file according to `template.env` and run 
 
-    sudo docker build --tag paybackapp .
-
-Then to start the container:
-
-    sudo docker run -v "$(pwd):/app" -dp 6000:6000 paybackapp
-
-If you start the container from outside the application directory, then use the path to the application directory instead of $(pwd).
-
+```
+docker compose up
+```
 
 ## Telegram Bot Client
 * used to work at last commit but needs updates now
