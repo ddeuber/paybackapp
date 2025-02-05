@@ -4,12 +4,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_mail import Mail
-from datetime import datetime
+from flask_cors import CORS
 from dotenv import load_dotenv
 
 
 # Initialize app
 app = Flask(__name__)
+CORS(app, origins=["http://localhost:4200"])
 
 # Load .env file for environment variables
 # load_dotenv('.env.production')
@@ -26,8 +27,8 @@ app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
 app.config['MAIL_USE_TLS'] = bool(int(os.getenv('MAIL_USE_TLS'))) # booleans are encoded as 1 and 0
 app.config['MAIL_USE_SSL'] = bool(int(os.getenv('MAIL_USE_SSL')))
 app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('SQLALCHEMY_DATABASE_URI')
-app.config['PROPAGATE_EXCEPTIONS'] = bool(int(os.getenv('PROPAGATE_EXCEPTIONS')))
+app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///payapp_database.db"
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
 
 # Database configuration

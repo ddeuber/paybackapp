@@ -54,9 +54,3 @@ atexit.register(lambda: scheduler.shutdown())
 if __name__ == '__main__':
     # Run app 
     app.run(host='::', port=5000, debug=False, use_reloader=False)
-
-# Enable logging if started by Gunicorn
-if __name__ != '__main__':
-    gunicorn_logger = logging.getLogger('gunicorn.error')
-    app.logger.handlers = gunicorn_logger.handlers
-    app.logger.setLevel(gunicorn_logger.level)
