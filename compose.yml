@@ -19,7 +19,7 @@ services:
     command:
       - -c
       - |
-        if [ ! -f "payapp_database.db" ]; then
+        if [ ! -f "instance/payapp_database.db" ]; then
           echo "payapp_database.db does not exist. Running the initialization script..."
           python init_database.py 
           echo "Initialization complete."
